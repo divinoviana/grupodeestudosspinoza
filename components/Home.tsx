@@ -18,7 +18,7 @@ const Home: React.FC<HomeProps> = ({ members }) => {
         />
         <div className="relative z-10 text-center max-w-4xl px-4">
           <h1 className="font-serif text-5xl md:text-7xl text-white mb-6 leading-tight">
-            "Deus, sive Natura"
+            "Deus sive Natura"
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 font-light mb-8 italic">
             Acompanhe o pensamento de Baruch Spinoza em um ambiente de diálogo acadêmico e livre.
