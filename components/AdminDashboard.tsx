@@ -111,17 +111,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ publications, events, o
         <div className="relative group">
           <pre className="bg-black/50 p-6 rounded-2xl text-[13px] overflow-x-auto text-green-400 font-mono leading-relaxed border border-white/5 shadow-inner">
 {`
--- 1. Tabela de Perfis de Membros
+-- 1. Tabela de Perfis de Membros (Atualizada com lattes_url)
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   username TEXT UNIQUE,
   full_name TEXT,
   bio TEXT,
   academic_info TEXT,
+  lattes_url TEXT,
   role TEXT DEFAULT 'member' CHECK (role IN ('admin', 'member'))
 );
 
--- 2. Tabela de Publicações Acadêmicas (Com suporte aos seus links)
+-- 2. Tabela de Publicações Acadêmicas
 CREATE TABLE publications (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   title TEXT NOT NULL,
@@ -171,9 +172,12 @@ CREATE POLICY "Acesso público leitura" ON forum_topics FOR SELECT USING (true);
 CREATE POLICY "Admins inserem publicações" ON publications FOR INSERT WITH CHECK (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
 );
+
+-- 8. Política para usuários atualizarem seus próprios perfis
+CREATE POLICY "Usuários atualizam próprio perfil" ON profiles FOR UPDATE USING (auth.uid() = id);
 `}
           </pre>
-          <div className="absolute top-4 right-4 text-[10px] bg-[#d4af37] text-[#0f172a] px-2 py-1 rounded font-bold uppercase">Script SQL Oficial</div>
+          <div className="absolute top-4 right-4 text-[10px] bg-[#d4af37] text-[#0f172a] px-2 py-1 rounded font-bold uppercase">Script SQL Oficial Atualizado</div>
         </div>
       </div>
     </div>

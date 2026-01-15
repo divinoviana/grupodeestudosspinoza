@@ -24,7 +24,7 @@ const App: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [topics, setTopics] = useState<ForumTopic[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
-  const [members, setMembers] = useState<string[]>([]);
+  const [members, setMembers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -63,10 +63,9 @@ const App: React.FC = () => {
         supabase.from('events').select('*').order('date', { ascending: true }),
         supabase.from('forum_topics').select('*').order('created_at', { ascending: false }),
         supabase.from('gallery_items').select('*').order('created_at', { ascending: false }),
-        supabase.from('profiles').select('full_name')
+        supabase.from('profiles').select('*')
       ]);
 
-      // Combine default publications with ones from DB if they exist
       if (pubs.data && pubs.data.length > 0) {
         setPublications(pubs.data);
       }
@@ -74,15 +73,9 @@ const App: React.FC = () => {
       if (evs.data) setEvents(evs.data);
       if (tops.data) setTopics(tops.data);
       if (gals.data) setGallery(gals.data);
+      
       if (profs.data) {
-        const dbMembers = profs.data.map(p => p.full_name);
-        // Ensure Divino is always in the list
-        if (!dbMembers.includes("Prof. Me. Divino Ribeiro Viana")) {
-           dbMembers.unshift("Prof. Me. Divino Ribeiro Viana");
-        }
-        setMembers(dbMembers);
-      } else {
-        setMembers(["Prof. Me. Divino Ribeiro Viana"]);
+        setMembers(profs.data);
       }
     } catch (e) {
       console.error("Erro ao carregar dados do Supabase", e);
@@ -92,6 +85,14 @@ const App: React.FC = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setCurrentUser(null);
+  };
+
+  const handleUpdateProfile = async (profile: UserProfile) => {
+    const { error } = await supabase.from('profiles').upsert(profile);
+    if (!error) {
+      setCurrentUser(profile);
+      fetchInitialData();
+    }
   };
 
   const addTopic = async (topic: ForumTopic) => {
@@ -133,7 +134,7 @@ const App: React.FC = () => {
             <Route path="/forum" element={<Forum topics={topics} user={currentUser} onAddTopic={addTopic} />} />
             <Route path="/eventos" element={<Events events={events} user={currentUser} />} />
             <Route path="/galeria" element={<Gallery items={gallery} />} />
-            <Route path="/perfil" element={currentUser ? <Profile user={currentUser} onUpdate={setCurrentUser} /> : <Navigate to="/auth" />} />
+            <Route path="/perfil" element={currentUser ? <Profile user={currentUser} onUpdate={handleUpdateProfile} /> : <Navigate to="/auth" />} />
             <Route path="/admin" element={currentUser?.role === 'admin' ? <AdminDashboard publications={publications} events={events} onAddEvent={addEvent} onDeleteEvent={deleteEvent} /> : <Navigate to="/" />} />
             <Route path="/auth" element={<Auth />} />
           </Routes>

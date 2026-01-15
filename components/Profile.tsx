@@ -44,7 +44,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdate }) => {
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-600">Nome de Usuário</label>
               <input 
-                className="w-full p-3 bg-slate-50 border rounded-lg" 
+                className="w-full p-3 bg-slate-50 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none" 
                 value={formData.username} 
                 onChange={e => setFormData({...formData, username: e.target.value})}
               />
@@ -52,7 +52,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdate }) => {
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-600">Nome Completo</label>
               <input 
-                className="w-full p-3 bg-slate-50 border rounded-lg" 
+                className="w-full p-3 bg-slate-50 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none" 
                 value={formData.full_name}
                 onChange={e => setFormData({...formData, full_name: e.target.value})}
               />
@@ -60,30 +60,41 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdate }) => {
           </div>
 
           <div className="space-y-2">
+            <label className="text-sm font-bold text-slate-600">Link do Currículo Lattes</label>
+            <input 
+              className="w-full p-3 bg-slate-50 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none" 
+              placeholder="Ex: http://lattes.cnpq.br/..."
+              value={formData.lattes_url || ''}
+              onChange={e => setFormData({...formData, lattes_url: e.target.value})}
+            />
+            <p className="text-[10px] text-slate-400 italic">Ao adicionar o link, seu currículo aparecerá na página inicial junto com os outros membros do grupo.</p>
+          </div>
+
+          <div className="space-y-2">
             <label className="text-sm font-bold text-slate-600">Biografia</label>
             <textarea 
               rows={4}
-              className="w-full p-3 bg-slate-50 border rounded-lg" 
+              className="w-full p-3 bg-slate-50 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none" 
               placeholder="Fale um pouco sobre seu interesse em Spinoza..."
-              value={formData.bio}
+              value={formData.bio || ''}
               onChange={e => setFormData({...formData, bio: e.target.value})}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-600">Informações Acadêmicas</label>
+            <label className="text-sm font-bold text-slate-600">Informações Acadêmicas (Instituição, Grau, etc.)</label>
             <textarea 
               rows={3}
-              className="w-full p-3 bg-slate-50 border rounded-lg" 
-              placeholder="Formação, Instituição, Pesquisas..."
-              value={formData.academic_info}
+              className="w-full p-3 bg-slate-50 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none" 
+              placeholder="Ex: Mestrando em Filosofia pela UFT..."
+              value={formData.academic_info || ''}
               onChange={e => setFormData({...formData, academic_info: e.target.value})}
             />
           </div>
 
           <div className="pt-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-xs text-slate-400">Última atualização: {new Date().toLocaleDateString()}</p>
-            <button className="bg-[#0f172a] text-[#d4af37] px-10 py-3 rounded-lg font-bold shadow-lg hover:scale-105 transition">Salvar Perfil</button>
+            <button className="bg-[#0f172a] text-[#d4af37] px-10 py-3 rounded-lg font-bold shadow-lg hover:scale-105 transition active:scale-95">Salvar Perfil</button>
           </div>
         </form>
       </div>

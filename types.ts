@@ -9,6 +9,7 @@ export interface UserProfile {
   academic_info?: string;
   role: UserRole;
   avatar_url?: string;
+  lattes_url?: string;
 }
 
 export interface Publication {

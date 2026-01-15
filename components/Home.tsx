@@ -1,12 +1,20 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { UserProfile } from '../types';
 
 interface HomeProps {
-  members: string[];
+  members: UserProfile[];
 }
 
 const Home: React.FC<HomeProps> = ({ members }) => {
+  // Encontrar o Prof. Divino ou usar dados padrão se não logado/carregado
+  const divinoProfile = members.find(m => m.full_name.includes("Divino Ribeiro Viana"));
+  const divinoLattes = divinoProfile?.lattes_url || "http://lattes.cnpq.br/7639474934278364";
+
+  // Membros com currículo cadastrado
+  const membersWithCV = members.filter(m => m.lattes_url);
+
   return (
     <div className="space-y-16 pb-20">
       {/* Hero Section */}
@@ -35,7 +43,7 @@ const Home: React.FC<HomeProps> = ({ members }) => {
       </section>
 
       {/* Intro Info */}
-      <section className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+      <section className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-start">
         <div className="space-y-6">
           <h2 className="font-serif text-4xl text-slate-800">Um Espaço Aberto para Todos</h2>
           <p className="text-lg text-slate-600 leading-relaxed">
@@ -46,26 +54,62 @@ const Home: React.FC<HomeProps> = ({ members }) => {
             Este grupo é aberto a todos os interessados(as), independente de sua área de atuação ou formação acadêmica. 
             A filosofia spinozana nos ensina que a potência de agir e pensar é um esforço comum.
           </p>
-          <div className="pt-4 flex items-center space-x-6">
-            <a href="http://lattes.cnpq.br/7639474934278364" target="_blank" className="text-blue-700 hover:underline flex items-center gap-2">
+          <div className="pt-4 flex flex-col sm:flex-row sm:items-center gap-6">
+            <a href={divinoLattes} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline flex items-center gap-2 font-medium">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
-              Currículo Lattes
+              Currículo - Prof. Me. Divino Ribeiro Viana
             </a>
-            <a href="https://www.youtube.com/channel/UCTJEBpIkx-ghf5N9TuAsG8g" target="_blank" className="text-red-700 hover:underline flex items-center gap-2">
+            <a href="https://www.youtube.com/channel/UCTJEBpIkx-ghf5N9TuAsG8g" target="_blank" rel="noopener noreferrer" className="text-red-700 hover:underline flex items-center gap-2 font-medium">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 4-8 4z"/></svg>
-              Canal YouTube
+              Entre no canal do Grupo no YouTube
             </a>
           </div>
+
+          {/* Currículos dos Membros */}
+          <div className="mt-12 bg-slate-50 p-8 rounded-2xl border border-slate-100 shadow-inner">
+            <h3 className="font-serif text-2xl text-slate-800 mb-6 flex items-center gap-3">
+              <span className="w-2 h-8 bg-[#d4af37] rounded"></span>
+              Currículos Lattes dos Pesquisadores
+            </h3>
+            <div className="grid gap-4">
+              {membersWithCV.length > 0 ? membersWithCV.map((member) => (
+                <a 
+                  key={member.id} 
+                  href={member.lattes_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-white p-4 rounded-lg border border-slate-200 flex items-center justify-between hover:border-[#d4af37] hover:shadow-md transition group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#0f172a] text-[#d4af37] flex items-center justify-center text-xs font-bold">
+                      {member.full_name[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-800 group-hover:text-[#0f172a]">{member.full_name}</p>
+                      <p className="text-[10px] text-slate-400 uppercase tracking-widest">{member.academic_info || 'Membro do Grupo'}</p>
+                    </div>
+                  </div>
+                  <span className="text-xs text-[#d4af37] font-bold group-hover:underline">Ver Lattes &rarr;</span>
+                </a>
+              )) : (
+                <p className="text-sm text-slate-400 italic text-center py-4">Nenhum currículo de membro cadastrado ainda.</p>
+              )}
+            </div>
+            <p className="mt-6 text-xs text-slate-500 italic">
+              * Membros podem adicionar seu link Lattes na página de Perfil para aparecer nesta lista.
+            </p>
+          </div>
         </div>
-        <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
+
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 sticky top-24">
           <h3 className="font-serif text-2xl text-slate-800 mb-6 flex items-center gap-3">
             <span className="w-2 h-8 bg-[#d4af37] rounded"></span>
             Membros Ativos
           </h3>
           <div className="flex flex-wrap gap-3">
-            {members.map((name, i) => (
+            {members.map((member, i) => (
               <span key={i} className="px-4 py-2 bg-slate-50 text-slate-700 rounded-full border border-slate-200 text-sm font-medium hover:bg-[#d4af37]/10 transition cursor-default">
-                {name}
+                {member.full_name}
               </span>
             ))}
             <span className="px-4 py-2 bg-[#d4af37] text-[#0f172a] rounded-full text-sm font-bold animate-pulse">
