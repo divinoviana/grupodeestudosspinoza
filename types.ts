@@ -23,6 +23,15 @@ export interface Publication {
   created_at: string;
 }
 
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  created_at: string;
+  is_read: boolean;
+}
+
 export interface Event {
   id: string;
   title: string;

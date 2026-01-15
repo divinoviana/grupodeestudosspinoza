@@ -1,19 +1,53 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { UserProfile } from '../types';
+import { supabase } from '../supabaseClient';
 
 interface HomeProps {
   members: UserProfile[];
 }
 
 const Home: React.FC<HomeProps> = ({ members }) => {
-  // Encontrar o Prof. Divino ou usar dados padrão se não logado/carregado
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [isSent, setIsSent] = useState(false);
+
   const divinoProfile = members.find(m => m.full_name.includes("Divino Ribeiro Viana"));
   const divinoLattes = divinoProfile?.lattes_url || "http://lattes.cnpq.br/7639474934278364";
-
-  // Membros com currículo cadastrado
   const membersWithCV = members.filter(m => m.lattes_url);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSending(true);
+
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert([{
+          name: contactName,
+          email: contactEmail,
+          message: contactMessage,
+          is_read: false
+        }]);
+
+      if (error) throw error;
+
+      setIsSent(true);
+      setContactName('');
+      setContactEmail('');
+      setContactMessage('');
+      
+      setTimeout(() => setIsSent(false), 5000);
+    } catch (err) {
+      alert("Erro ao enviar mensagem. Tente novamente mais tarde.");
+      console.error(err);
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   return (
     <div className="space-y-16 pb-20">
@@ -65,11 +99,10 @@ const Home: React.FC<HomeProps> = ({ members }) => {
             </a>
           </div>
 
-          {/* Currículos dos Membros */}
           <div className="mt-12 bg-slate-50 p-8 rounded-2xl border border-slate-100 shadow-inner">
             <h3 className="font-serif text-2xl text-slate-800 mb-6 flex items-center gap-3">
               <span className="w-2 h-8 bg-[#d4af37] rounded"></span>
-              Currículos Lattes dos Pesquisadores
+              Pesquisadores do Grupo
             </h3>
             <div className="grid gap-4">
               {membersWithCV.length > 0 ? membersWithCV.map((member) => (
@@ -95,9 +128,6 @@ const Home: React.FC<HomeProps> = ({ members }) => {
                 <p className="text-sm text-slate-400 italic text-center py-4">Nenhum currículo de membro cadastrado ainda.</p>
               )}
             </div>
-            <p className="mt-6 text-xs text-slate-500 italic">
-              * Membros podem adicionar seu link Lattes na página de Perfil para aparecer nesta lista.
-            </p>
           </div>
         </div>
 
@@ -116,9 +146,6 @@ const Home: React.FC<HomeProps> = ({ members }) => {
               + Você
             </span>
           </div>
-          <p className="mt-6 text-sm text-slate-500 italic">
-            O cadastro é gratuito e dá acesso a fóruns, publicações exclusivas e certificados de participação.
-          </p>
         </div>
       </section>
 
@@ -152,13 +179,54 @@ const Home: React.FC<HomeProps> = ({ members }) => {
       {/* Contact Section */}
       <section className="max-w-3xl mx-auto px-4 text-center">
         <h2 className="font-serif text-3xl mb-8">Fale Conosco</h2>
-        <form className="space-y-4 bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+        <form onSubmit={handleContactSubmit} className="space-y-4 bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+           {isSent && (
+             <div className="p-4 bg-green-50 text-green-700 rounded-lg mb-4 font-bold animate-fade-in border border-green-200 flex items-center justify-center gap-2">
+               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+               Mensagem enviada com sucesso! O Prof. Divino responderá em breve.
+             </div>
+           )}
            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-             <input type="text" placeholder="Seu Nome" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none" />
-             <input type="email" placeholder="Seu E-mail" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none" />
+             <input 
+               required
+               type="text" 
+               placeholder="Seu Nome" 
+               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none"
+               value={contactName}
+               onChange={(e) => setContactName(e.target.value)}
+               disabled={isSending}
+             />
+             <input 
+               required
+               type="email" 
+               placeholder="Seu E-mail" 
+               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none"
+               value={contactEmail}
+               onChange={(e) => setContactEmail(e.target.value)}
+               disabled={isSending}
+             />
            </div>
-           <textarea rows={4} placeholder="Sua mensagem ou dúvida sobre os estudos" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none"></textarea>
-           <button type="submit" className="w-full bg-[#0f172a] text-white py-4 rounded-lg font-bold hover:bg-slate-800 transition">Enviar para grupodeestudosspinoza@gmail.com</button>
+           <textarea 
+             required
+             rows={4} 
+             placeholder="Sua mensagem ou dúvida sobre os estudos..." 
+             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none"
+             value={contactMessage}
+             onChange={(e) => setContactMessage(e.target.value)}
+             disabled={isSending}
+           ></textarea>
+           <button 
+             type="submit" 
+             disabled={isSending}
+             className="w-full bg-[#0f172a] text-white py-4 rounded-lg font-bold hover:bg-slate-800 transition flex items-center justify-center gap-2 shadow-xl disabled:opacity-50"
+           >
+             {isSending ? (
+               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+             ) : (
+               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+             )}
+             Enviar Mensagem
+           </button>
         </form>
       </section>
     </div>
