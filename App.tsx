@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { UserProfile, Publication, Event, ForumTopic, GalleryItem } from './types';
 import { supabase } from './supabaseClient';
+import { INITIAL_PUBLICATIONS } from './initialData';
 
 // Pages & Components
 import Navbar from './components/Navbar';
@@ -19,7 +20,7 @@ import AIAssistant from './components/AIAssistant';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const [publications, setPublications] = useState<Publication[]>([]);
+  const [publications, setPublications] = useState<Publication[]>(INITIAL_PUBLICATIONS);
   const [events, setEvents] = useState<Event[]>([]);
   const [topics, setTopics] = useState<ForumTopic[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
@@ -56,19 +57,36 @@ const App: React.FC = () => {
   };
 
   const fetchInitialData = async () => {
-    const [pubs, evs, tops, gals, profs] = await Promise.all([
-      supabase.from('publications').select('*').order('created_at', { ascending: false }),
-      supabase.from('events').select('*').order('date', { ascending: true }),
-      supabase.from('forum_topics').select('*').order('created_at', { ascending: false }),
-      supabase.from('gallery_items').select('*').order('created_at', { ascending: false }),
-      supabase.from('profiles').select('full_name')
-    ]);
+    try {
+      const [pubs, evs, tops, gals, profs] = await Promise.all([
+        supabase.from('publications').select('*').order('created_at', { ascending: false }),
+        supabase.from('events').select('*').order('date', { ascending: true }),
+        supabase.from('forum_topics').select('*').order('created_at', { ascending: false }),
+        supabase.from('gallery_items').select('*').order('created_at', { ascending: false }),
+        supabase.from('profiles').select('full_name')
+      ]);
 
-    if (pubs.data) setPublications(pubs.data);
-    if (evs.data) setEvents(evs.data);
-    if (tops.data) setTopics(tops.data);
-    if (gals.data) setGallery(gals.data);
-    if (profs.data) setMembers(profs.data.map(p => p.full_name));
+      // Combine default publications with ones from DB if they exist
+      if (pubs.data && pubs.data.length > 0) {
+        setPublications(pubs.data);
+      }
+      
+      if (evs.data) setEvents(evs.data);
+      if (tops.data) setTopics(tops.data);
+      if (gals.data) setGallery(gals.data);
+      if (profs.data) {
+        const dbMembers = profs.data.map(p => p.full_name);
+        // Ensure Divino is always in the list
+        if (!dbMembers.includes("Prof. Me. Divino Ribeiro Viana")) {
+           dbMembers.unshift("Prof. Me. Divino Ribeiro Viana");
+        }
+        setMembers(dbMembers);
+      } else {
+        setMembers(["Prof. Me. Divino Ribeiro Viana"]);
+      }
+    } catch (e) {
+      console.error("Erro ao carregar dados do Supabase", e);
+    }
   };
 
   const handleLogout = async () => {
@@ -96,7 +114,12 @@ const App: React.FC = () => {
     if (!error) setEvents(prev => prev.filter(e => e.id !== id));
   };
 
-  if (loading) return <div className="h-screen flex items-center justify-center font-serif text-[#0f172a]">Carregando Portal Spinoza...</div>;
+  if (loading) return <div className="h-screen flex items-center justify-center font-serif text-[#0f172a] bg-slate-50">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-[#d4af37] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p className="text-xl italic">Carregando o pensamento de Spinoza...</p>
+    </div>
+  </div>;
 
   return (
     <HashRouter>
@@ -137,7 +160,7 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="mt-12 text-center text-gray-500 text-sm">
-            &copy; 2025 Portal Spinoza - Desenvolvido para Prof. Me. Divino Viana
+            &copy; 2025 Portal Spinoza - Coordenado por Prof. Me. Divino Ribeiro Viana
           </div>
         </footer>
 

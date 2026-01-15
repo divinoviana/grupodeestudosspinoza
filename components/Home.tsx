@@ -39,7 +39,7 @@ const Home: React.FC<HomeProps> = ({ members }) => {
         <div className="space-y-6">
           <h2 className="font-serif text-4xl text-slate-800">Um Espaço Aberto para Todos</h2>
           <p className="text-lg text-slate-600 leading-relaxed">
-            O <strong>Grupo de Estudos Spinoza</strong>, liderado pelo Prof. Me. Divino Viana, é um espaço democrático de investigação filosófica. 
+            O <strong>Grupo de Estudos Spinoza</strong>, liderado pelo Prof. Me. Divino Ribeiro Viana, é um espaço democrático de investigação filosófica. 
             Acreditamos que o pensamento de Spinoza é vital para compreendermos a ética, a política e a natureza no século XXI.
           </p>
           <p className="text-lg text-slate-600 leading-relaxed font-semibold border-l-4 border-[#d4af37] pl-4">
