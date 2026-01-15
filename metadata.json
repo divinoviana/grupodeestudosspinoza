@@ -1,0 +1,8 @@
+{
+  "name": "Portal Spinoza - Grupo de Estudos",
+  "description": "Um portal acadêmico dedicado ao pensamento de Baruch Spinoza, integrando fóruns, publicações, calendário de eventos e assistência por IA.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
