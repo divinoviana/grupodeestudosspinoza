@@ -115,12 +115,16 @@ const App: React.FC = () => {
     if (!error) setEvents(prev => prev.filter(e => e.id !== id));
   };
 
-  if (loading) return <div className="h-screen flex items-center justify-center font-serif text-[#0f172a] bg-slate-50">
-    <div className="text-center">
-      <div className="w-16 h-16 border-4 border-[#d4af37] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-      <p className="text-xl italic">Carregando o pensamento de Spinoza...</p>
+  if (loading) return (
+    <div className="h-screen flex items-center justify-center font-serif text-[#0f172a] bg-[#0f172a]">
+      <div className="text-center">
+        <div className="w-20 h-20 border-4 border-[#d4af37] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+        <div className="w-12 h-12 bg-[#d4af37] rounded-full flex items-center justify-center text-[#0f172a] font-serif font-bold text-2xl mx-auto mb-6 -mt-16 relative z-10">S</div>
+        <p className="text-xl italic text-white">Carregando o pensamento de Spinoza...</p>
+        <p className="text-[#d4af37]/60 text-sm mt-2 uppercase tracking-widest">Portal Spinoza</p>
+      </div>
     </div>
-  </div>;
+  );
 
   return (
     <HashRouter>
@@ -140,28 +144,56 @@ const App: React.FC = () => {
           </Routes>
         </main>
 
-        <footer className="bg-[#0f172a] text-white py-12 mt-12 border-t border-[#b4941f]/30">
-          <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-            <div>
-              <h3 className="font-serif text-2xl mb-4 text-[#d4af37]">Grupo de Estudos Spinoza</h3>
-              <p className="text-gray-400">Dedicado à pesquisa e difusão do pensamento de Baruch Spinoza.</p>
+        <footer className="bg-[#0f172a] text-white border-t border-[#b4941f]/20">
+          <div className="max-w-7xl mx-auto px-4 pt-16 pb-10 grid grid-cols-1 md:grid-cols-4 gap-10">
+            <div className="md:col-span-2 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#d4af37] rounded-full flex items-center justify-center text-[#0f172a] font-serif font-bold text-xl">S</div>
+                <div>
+                  <p className="font-serif text-xl">Portal Spinoza</p>
+                  <p className="text-[10px] text-[#d4af37]/60 uppercase tracking-widest">Grupo de Estudos</p>
+                </div>
+              </div>
+              <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
+                Dedicado à pesquisa, difusão e debate do pensamento de Baruch Spinoza — filósofo do século XVII.
+              </p>
+              <div className="flex items-center gap-4 pt-2">
+                <a href="https://www.youtube.com/channel/UCTJEBpIkx-ghf5N9TuAsG8g" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-red-500 transition" title="YouTube">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 4-8 4z"/></svg>
+                </a>
+                <a href="mailto:grupodeestudosspinoza@gmail.com" className="text-slate-400 hover:text-[#d4af37] transition" title="E-mail">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </a>
+              </div>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4 uppercase tracking-widest text-sm text-[#d4af37]">Links Rápidos</h4>
-              <ul className="space-y-2 text-gray-400">
+            <div className="space-y-4">
+              <h4 className="font-bold uppercase tracking-[0.2em] text-xs text-[#d4af37]">Navegação</h4>
+              <ul className="space-y-2.5 text-slate-400 text-sm">
+                <li><Link to="/" className="hover:text-white transition">Início</Link></li>
                 <li><Link to="/publicacoes" className="hover:text-white transition">Publicações</Link></li>
-                <li><Link to="/eventos" className="hover:text-white transition">Agenda</Link></li>
-                <li><a href="https://www.youtube.com/channel/UCTJEBpIkx-ghf5N9TuAsG8g" target="_blank" className="hover:text-white transition">YouTube</a></li>
+                <li><Link to="/forum" className="hover:text-white transition">Fórum</Link></li>
+                <li><Link to="/eventos" className="hover:text-white transition">Eventos</Link></li>
+                <li><Link to="/galeria" className="hover:text-white transition">Galeria</Link></li>
               </ul>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4 uppercase tracking-widest text-sm text-[#d4af37]">Contato</h4>
-              <p className="text-gray-400">grupodeestudosspinoza@gmail.com</p>
-              <p className="text-gray-400">+55 63 99919-1919</p>
+            <div className="space-y-4">
+              <h4 className="font-bold uppercase tracking-[0.2em] text-xs text-[#d4af37]">Contato</h4>
+              <ul className="space-y-2.5 text-slate-400 text-sm">
+                <li className="flex items-start gap-2">
+                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                  <a href="mailto:grupodeestudosspinoza@gmail.com" className="hover:text-white transition break-all">
+                    grupodeestudosspinoza@gmail.com
+                  </a>
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.319 1.592 5.548 0 10.058-4.51 10.06-10.059 0-2.692-1.047-5.224-2.95-7.129-1.901-1.902-4.434-2.951-7.11-2.951-5.548 0-10.057 4.51-10.059 10.059 0 2.152.593 3.657 1.648 5.483l-.98 3.578 3.673-.964z"/></svg>
+                  +55 63 99919-1919
+                </li>
+              </ul>
             </div>
           </div>
-          <div className="mt-12 text-center text-gray-500 text-sm">
-            &copy; 2025 Portal Spinoza - Coordenado por Prof. Me. Divino Ribeiro Viana
+          <div className="border-t border-white/10 py-6 text-center text-slate-500 text-xs">
+            &copy; {new Date().getFullYear()} Portal Spinoza · Coordenado por Prof. Me. Divino Ribeiro Viana
           </div>
         </footer>
 
