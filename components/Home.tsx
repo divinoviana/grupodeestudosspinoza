@@ -98,10 +98,6 @@ const Home: React.FC<HomeProps> = ({ members, user }) => {
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
               Currículo - Prof. Me. Divino Ribeiro Viana
             </a>
-            <a href="https://www.youtube.com/channel/UCTJEBpIkx-ghf5N9TuAsG8g" target="_blank" rel="noopener noreferrer" className="text-red-700 hover:underline flex items-center gap-2 font-medium">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 4-8 4z"/></svg>
-              Entre no canal do Grupo no YouTube
-            </a>
           </div>
 
           <div className="mt-12 bg-slate-50 p-8 rounded-2xl border border-slate-100 shadow-inner">
