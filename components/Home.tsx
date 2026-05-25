@@ -1,8 +1,18 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { UserProfile } from '../types';
 import { supabase } from '../supabaseClient';
+
+const CHANNEL_ID = 'UCTJEBpIkx-ghf5N9TuAsG8g';
+
+interface YTVideo {
+  title: string;
+  videoId: string;
+  pubDate: string;
+  thumbnail: string;
+  link: string;
+}
 
 interface HomeProps {
   members: UserProfile[];
@@ -14,6 +24,33 @@ const Home: React.FC<HomeProps> = ({ members }) => {
   const [contactMessage, setContactMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [videos, setVideos] = useState<YTVideo[]>([]);
+  const [videosLoading, setVideosLoading] = useState(true);
+
+  useEffect(() => {
+    const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=6`;
+
+    fetch(apiUrl)
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'ok') {
+          const parsed: YTVideo[] = data.items.map((item: any) => {
+            const videoId = item.link.split('v=')[1]?.split('&')[0] || '';
+            return {
+              title: item.title,
+              videoId,
+              pubDate: item.pubDate,
+              thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+              link: item.link,
+            };
+          });
+          setVideos(parsed);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setVideosLoading(false));
+  }, []);
 
   const divinoProfile = members.find(m => m.full_name.includes("Divino Ribeiro Viana"));
   const divinoLattes = divinoProfile?.lattes_url || "http://lattes.cnpq.br/7639474934278364";
@@ -176,6 +213,92 @@ const Home: React.FC<HomeProps> = ({ members }) => {
         </div>
       </section>
       
+      {/* YouTube Videos Section */}
+      <section className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between mb-10">
+          <div>
+            <h2 className="font-serif text-4xl text-slate-800 mb-2">Aulas e Encontros no YouTube</h2>
+            <p className="text-slate-500">Últimos vídeos publicados pelo grupo</p>
+          </div>
+          <a
+            href={`https://www.youtube.com/channel/${CHANNEL_ID}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-2 bg-red-600 text-white px-5 py-2.5 rounded-full font-bold hover:bg-red-700 transition text-sm"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 4-8 4z"/>
+            </svg>
+            Ver canal
+          </a>
+        </div>
+
+        {videosLoading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-slate-100 rounded-2xl overflow-hidden animate-pulse">
+                <div className="bg-slate-200 aspect-video w-full" />
+                <div className="p-4 space-y-2">
+                  <div className="h-4 bg-slate-200 rounded w-3/4" />
+                  <div className="h-3 bg-slate-200 rounded w-1/3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : videos.length > 0 ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {videos.map(v => (
+              <a
+                key={v.videoId}
+                href={v.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group bg-white rounded-2xl overflow-hidden shadow-md border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition duration-300"
+              >
+                <div className="relative aspect-video overflow-hidden bg-slate-900">
+                  <img
+                    src={v.thumbnail}
+                    alt={v.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition bg-black/40">
+                    <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-2xl">
+                      <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <p className="font-semibold text-slate-800 leading-snug line-clamp-2 group-hover:text-[#d4af37] transition">
+                    {v.title}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-2">
+                    {new Date(v.pubDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                  </p>
+                </div>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 text-slate-400">
+            <p>Nenhum vídeo encontrado. Verifique o canal no YouTube.</p>
+          </div>
+        )}
+
+        <div className="mt-8 text-center sm:hidden">
+          <a
+            href={`https://www.youtube.com/channel/${CHANNEL_ID}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 transition"
+          >
+            Ver canal completo no YouTube
+          </a>
+        </div>
+      </section>
+
       {/* Contact Section */}
       <section className="max-w-3xl mx-auto px-4 text-center">
         <h2 className="font-serif text-3xl mb-8">Fale Conosco</h2>
