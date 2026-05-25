@@ -93,12 +93,6 @@ const Home: React.FC<HomeProps> = ({ members, user }) => {
             Este grupo é aberto a todos os interessados(as), independente de sua área de atuação ou formação acadêmica. 
             A filosofia spinozana nos ensina que a potência de agir e pensar é um esforço comum.
           </p>
-          <div className="pt-4 flex flex-col sm:flex-row sm:items-center gap-6">
-            <a href={divinoLattes} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline flex items-center gap-2 font-medium">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
-              Currículo - Prof. Me. Divino Ribeiro Viana
-            </a>
-          </div>
 
           <div className="mt-12 bg-slate-50 p-8 rounded-2xl border border-slate-100 shadow-inner">
             <h3 className="font-serif text-2xl text-slate-800 mb-6 flex items-center gap-3">
