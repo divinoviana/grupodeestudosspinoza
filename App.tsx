@@ -133,7 +133,7 @@ const App: React.FC = () => {
             <Route path="/publicacoes" element={<Publications publications={publications} user={currentUser} onAdd={addPublication} />} />
             <Route path="/forum" element={<Forum topics={topics} user={currentUser} onAddTopic={addTopic} />} />
             <Route path="/eventos" element={<Events events={events} user={currentUser} />} />
-            <Route path="/galeria" element={<Gallery items={gallery} />} />
+            <Route path="/galeria" element={<Gallery items={gallery} user={currentUser} onAdd={item => setGallery(prev => [item, ...prev])} onDelete={id => setGallery(prev => prev.filter(g => g.id !== id))} />} />
             <Route path="/perfil" element={currentUser ? <Profile user={currentUser} onUpdate={handleUpdateProfile} /> : <Navigate to="/auth" />} />
             <Route path="/admin" element={currentUser?.role === 'admin' ? <AdminDashboard publications={publications} events={events} onAddEvent={addEvent} onDeleteEvent={deleteEvent} /> : <Navigate to="/" />} />
             <Route path="/auth" element={<Auth />} />

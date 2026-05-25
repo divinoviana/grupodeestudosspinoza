@@ -66,5 +66,6 @@ export interface GalleryItem {
   id: string;
   title: string;
   image_url: string;
+  album?: string;
   created_at: string;
 }
