@@ -161,7 +161,15 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="mt-12 text-center text-gray-500 text-sm">
-            &copy; 2025 Portal Spinoza - Coordenado por Prof. Me. Divino Ribeiro Viana
+            &copy; 2025 Portal Spinoza - Coordenado por{' '}
+            <a
+              href="http://lattes.cnpq.br/7639474934278364"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#d4af37] transition underline underline-offset-2"
+            >
+              Prof. Me. Divino Ribeiro Viana
+            </a>
           </div>
         </footer>
 
