@@ -54,12 +54,50 @@ const Events: React.FC<EventsProps> = ({ events, user }) => {
         ))}
       </div>
 
-      <div className="mt-20 p-8 bg-[#0f172a] text-white rounded-3xl flex flex-col md:flex-row items-center justify-between gap-8">
-        <div className="max-w-xl">
-           <h2 className="font-serif text-3xl mb-4">Integração com o Google Calendar</h2>
-           <p className="opacity-80">Receba notificações automáticas de novos encontros diretamente no seu e-mail do grupo: <span className="font-bold">grupodeestudosspinoza@gmail.com</span>.</p>
+      {/* Google Calendar */}
+      <div className="mt-20">
+        <div className="mb-6">
+          <h2 className="font-serif text-3xl text-slate-800 mb-2">Calendário do Grupo</h2>
+          <p className="text-slate-600">Todos os encontros, datas e eventos numa visão completa.</p>
         </div>
-        <button className="bg-white text-[#0f172a] px-8 py-3 rounded-full font-bold hover:scale-105 transition shadow-2xl">Inscrever-se na Agenda</button>
+        <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+          {user ? (
+            <div className="w-full overflow-x-auto">
+              <iframe
+                src="https://calendar.google.com/calendar/embed?src=grupodeestudosspinoza%40gmail.com&ctz=America%2FFortaleza&hl=pt_BR&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0"
+                style={{ border: 0 }}
+                width="100%"
+                height="600"
+                frameBorder={0}
+                scrolling="no"
+                title="Calendário do Grupo de Estudos Spinoza"
+              />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 px-8 text-center gap-4">
+              <svg className="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p className="text-slate-500 text-lg font-medium">Calendário disponível apenas para membros</p>
+              <p className="text-slate-400 text-sm">Faça login para visualizar a agenda completa do grupo.</p>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6 p-6 bg-[#0f172a] text-white rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <p className="font-semibold">Receba notificações dos eventos</p>
+            <p className="text-sm opacity-70">Adicione a agenda ao seu Google Calendar e fique por dentro de todos os encontros.</p>
+          </div>
+          <a
+            href="https://calendar.google.com/calendar/r?cid=grupodeestudosspinoza%40gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 bg-[#d4af37] text-[#0f172a] px-6 py-3 rounded-full font-bold hover:brightness-110 transition whitespace-nowrap"
+          >
+            + Adicionar à minha agenda
+          </a>
+        </div>
       </div>
     </div>
   );
