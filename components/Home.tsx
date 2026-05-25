@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { UserProfile } from '../types';
-import { supabase } from '../supabaseClient';
+import Agora from './Agora';
 
 const CHANNEL_ID = 'UCTJEBpIkx-ghf5N9TuAsG8g';
 
@@ -16,14 +16,10 @@ interface YTVideo {
 
 interface HomeProps {
   members: UserProfile[];
+  user: UserProfile | null;
 }
 
-const Home: React.FC<HomeProps> = ({ members }) => {
-  const [contactName, setContactName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactMessage, setContactMessage] = useState('');
-  const [isSending, setIsSending] = useState(false);
-  const [isSent, setIsSent] = useState(false);
+const Home: React.FC<HomeProps> = ({ members, user }) => {
   const [videos, setVideos] = useState<YTVideo[]>([]);
   const [videosLoading, setVideosLoading] = useState(true);
 
@@ -58,40 +54,10 @@ const Home: React.FC<HomeProps> = ({ members }) => {
   const divinoLattes = divinoProfile?.lattes_url || "http://lattes.cnpq.br/7639474934278364";
   const membersWithCV = members.filter(m => m.lattes_url);
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSending(true);
-
-    try {
-      const { error } = await supabase
-        .from('contact_messages')
-        .insert([{
-          name: contactName,
-          email: contactEmail,
-          message: contactMessage,
-          is_read: false
-        }]);
-
-      if (error) throw error;
-
-      setIsSent(true);
-      setContactName('');
-      setContactEmail('');
-      setContactMessage('');
-      
-      setTimeout(() => setIsSent(false), 5000);
-    } catch (err) {
-      alert("Erro ao enviar mensagem. Tente novamente mais tarde.");
-      console.error(err);
-    } finally {
-      setIsSending(false);
-    }
-  };
-
   return (
     <div className="space-y-16 pb-20">
       {/* Hero Section */}
-      <section className="relative h-[80vh] flex items-center justify-center overflow-hidden bg-[#0f172a]">
+      <section className="relative h-[52vh] flex items-center justify-center overflow-hidden bg-[#0f172a]">
         <img 
           src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Spinoza.jpg/330px-Spinoza.jpg" 
           alt="Bento Espinosa"
@@ -188,33 +154,6 @@ const Home: React.FC<HomeProps> = ({ members }) => {
         </div>
       </section>
 
-      {/* Pillars Section */}
-      <section className="bg-slate-100 py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl text-slate-800 mb-4">Nossos Pilares</h2>
-            <div className="w-24 h-1 bg-[#d4af37] mx-auto"></div>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-10 rounded-xl shadow-lg hover:-translate-y-2 transition duration-300">
-              <div className="w-16 h-16 bg-[#0f172a] text-[#d4af37] rounded-lg flex items-center justify-center mb-6 text-3xl">📚</div>
-              <h3 className="font-serif text-2xl mb-4">Pesquisa</h3>
-              <p className="text-slate-600">Produção acadêmica rigorosa, artigos e dissertações compartilhadas para fomentar o saber.</p>
-            </div>
-            <div className="bg-white p-10 rounded-xl shadow-lg hover:-translate-y-2 transition duration-300">
-              <div className="w-16 h-16 bg-[#0f172a] text-[#d4af37] rounded-lg flex items-center justify-center mb-6 text-3xl">🤝</div>
-              <h3 className="font-serif text-2xl mb-4">Debate</h3>
-              <p className="text-slate-600">Encontros síncronos e fóruns temáticos organizados para o intercâmbio de ideias.</p>
-            </div>
-            <div className="bg-white p-10 rounded-xl shadow-lg hover:-translate-y-2 transition duration-300">
-              <div className="w-16 h-16 bg-[#0f172a] text-[#d4af37] rounded-lg flex items-center justify-center mb-6 text-3xl">🤖</div>
-              <h3 className="font-serif text-2xl mb-4">IA Assistida</h3>
-              <p className="text-slate-600">Uso do Gemini 3 para auxílio em revisões bibliográficas e conceitos fundamentais.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-      
       {/* YouTube Videos Section */}
       <section className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-10">
@@ -312,59 +251,8 @@ const Home: React.FC<HomeProps> = ({ members }) => {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section className="max-w-3xl mx-auto px-4 text-center">
-        <h2 className="font-serif text-3xl mb-8">Fale Conosco</h2>
-        <form onSubmit={handleContactSubmit} className="space-y-4 bg-white p-8 rounded-xl shadow-lg border border-slate-200">
-           {isSent && (
-             <div className="p-4 bg-green-50 text-green-700 rounded-lg mb-4 font-bold animate-fade-in border border-green-200 flex items-center justify-center gap-2">
-               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-               Mensagem enviada com sucesso! O Prof. Divino responderá em breve.
-             </div>
-           )}
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-             <input 
-               required
-               type="text" 
-               placeholder="Seu Nome" 
-               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none"
-               value={contactName}
-               onChange={(e) => setContactName(e.target.value)}
-               disabled={isSending}
-             />
-             <input 
-               required
-               type="email" 
-               placeholder="Seu E-mail" 
-               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none"
-               value={contactEmail}
-               onChange={(e) => setContactEmail(e.target.value)}
-               disabled={isSending}
-             />
-           </div>
-           <textarea 
-             required
-             rows={4} 
-             placeholder="Sua mensagem ou dúvida sobre os estudos..." 
-             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#d4af37] outline-none"
-             value={contactMessage}
-             onChange={(e) => setContactMessage(e.target.value)}
-             disabled={isSending}
-           ></textarea>
-           <button 
-             type="submit" 
-             disabled={isSending}
-             className="w-full bg-[#0f172a] text-white py-4 rounded-lg font-bold hover:bg-slate-800 transition flex items-center justify-center gap-2 shadow-xl disabled:opacity-50"
-           >
-             {isSending ? (
-               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-             ) : (
-               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-             )}
-             Enviar Mensagem
-           </button>
-        </form>
-      </section>
+      {/* Ágora */}
+      <Agora user={user} />
     </div>
   );
 };

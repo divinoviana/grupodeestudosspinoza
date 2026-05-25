@@ -129,7 +129,7 @@ const App: React.FC = () => {
         
         <main className="flex-grow pt-20">
           <Routes>
-            <Route path="/" element={<Home members={members} />} />
+            <Route path="/" element={<Home members={members} user={currentUser} />} />
             <Route path="/publicacoes" element={<Publications publications={publications} user={currentUser} onAdd={addPublication} />} />
             <Route path="/forum" element={<Forum topics={topics} user={currentUser} onAddTopic={addTopic} />} />
             <Route path="/eventos" element={<Events events={events} user={currentUser} />} />
