@@ -154,6 +154,9 @@ const Home: React.FC<HomeProps> = ({ members, user }) => {
         </div>
       </section>
 
+      {/* Ágora */}
+      <Agora user={user} />
+
       {/* YouTube Videos Section */}
       <section className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-10">
@@ -251,8 +254,6 @@ const Home: React.FC<HomeProps> = ({ members, user }) => {
         </div>
       </section>
 
-      {/* Ágora */}
-      <Agora user={user} />
     </div>
   );
 };
