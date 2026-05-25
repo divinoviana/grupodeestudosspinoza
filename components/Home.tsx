@@ -55,7 +55,7 @@ const Home: React.FC<HomeProps> = ({ members }) => {
       <section className="relative h-[80vh] flex items-center justify-center overflow-hidden bg-[#0f172a]">
         <img 
           src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Spinoza.jpg/330px-Spinoza.jpg" 
-          alt="Baruch Spinoza"
+          alt="Bento Espinosa"
           className="absolute opacity-20 object-cover w-full h-full grayscale"
         />
         <div className="relative z-10 text-center max-w-4xl px-4">
@@ -63,7 +63,7 @@ const Home: React.FC<HomeProps> = ({ members }) => {
             "Deus sive Natura"
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 font-light mb-8 italic">
-            Acompanhe o pensamento de Baruch Spinoza em um ambiente de diálogo acadêmico e livre.
+            Acompanhe o pensamento de Bento Espinosa em um ambiente de diálogo acadêmico e livre.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/auth" className="w-full sm:w-auto px-8 py-4 bg-[#d4af37] text-[#0f172a] font-bold rounded-lg text-lg shadow-xl hover:scale-105 transition">

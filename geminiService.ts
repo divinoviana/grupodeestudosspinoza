@@ -7,7 +7,7 @@ export const askSpinozaAI = async (prompt: string, context: string = "") => {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Você é um assistente acadêmico especialista no pensamento de Baruch Spinoza para o Grupo de Estudos Spinoza do Prof. Divino Viana. 
+      contents: `Você é um assistente acadêmico especialista no pensamento de Bento Espinosa para o Grupo de Estudos Spinoza do Prof. Divino Viana. 
       Ajude o usuário com revisões, dicas de leitura ou esclarecendo conceitos de Ética, Ontologia, Política, etc. 
       Contexto opcional: ${context}. 
       Pergunta do usuário: ${prompt}`,

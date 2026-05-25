@@ -144,7 +144,7 @@ const App: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
             <div>
               <h3 className="font-serif text-2xl mb-4 text-[#d4af37]">Grupo de Estudos Spinoza</h3>
-              <p className="text-gray-400">Dedicado à pesquisa e difusão do pensamento de Baruch Spinoza.</p>
+              <p className="text-gray-400">Dedicado à pesquisa e difusão do pensamento de Bento Espinosa.</p>
             </div>
             <div>
               <h4 className="font-semibold mb-4 uppercase tracking-widest text-sm text-[#d4af37]">Links Rápidos</h4>
