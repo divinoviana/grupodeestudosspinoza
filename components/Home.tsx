@@ -28,21 +28,23 @@ const Home: React.FC<HomeProps> = ({ members }) => {
   const [videosLoading, setVideosLoading] = useState(true);
 
   useEffect(() => {
-    const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
-    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=6`;
+    const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+    if (!apiKey) { setVideosLoading(false); return; }
 
-    fetch(apiUrl)
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&maxResults=6&order=date&type=video&key=${apiKey}`;
+
+    fetch(url)
       .then(r => r.json())
       .then(data => {
-        if (data.status === 'ok') {
+        if (data.items) {
           const parsed: YTVideo[] = data.items.map((item: any) => {
-            const videoId = item.link.split('v=')[1]?.split('&')[0] || '';
+            const videoId = item.id.videoId;
             return {
-              title: item.title,
+              title: item.snippet.title,
               videoId,
-              pubDate: item.pubDate,
-              thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-              link: item.link,
+              pubDate: item.snippet.publishedAt,
+              thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
+              link: `https://www.youtube.com/watch?v=${videoId}`,
             };
           });
           setVideos(parsed);
@@ -282,8 +284,19 @@ const Home: React.FC<HomeProps> = ({ members }) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 text-slate-400">
-            <p>Nenhum vídeo encontrado. Verifique o canal no YouTube.</p>
+          <div className="text-center py-16 bg-slate-50 rounded-2xl border border-slate-200">
+            <svg className="w-12 h-12 text-red-400 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 4-8 4z"/>
+            </svg>
+            <p className="text-slate-600 font-medium mb-2">Chave de API do YouTube não configurada</p>
+            <a
+              href={`https://www.youtube.com/channel/${CHANNEL_ID}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-red-600 hover:underline text-sm font-semibold"
+            >
+              Ver vídeos diretamente no canal →
+            </a>
           </div>
         )}
 
