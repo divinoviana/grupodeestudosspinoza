@@ -22,10 +22,10 @@ const AIAssistant: React.FC = () => {
         <div className="bg-white w-80 sm:w-96 h-[500px] rounded-2xl shadow-2xl border border-[#d4af37]/30 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4">
           <div className="bg-[#0f172a] p-4 flex justify-between items-center text-white">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#d4af37] text-[#0f172a] rounded-full flex items-center justify-center font-bold">G</div>
+              <div className="w-8 h-8 bg-[#d4af37] text-[#0f172a] rounded-full flex items-center justify-center font-bold">S</div>
               <div>
                  <p className="text-xs font-bold uppercase tracking-widest text-[#d4af37]">Spinoza AI</p>
-                 <p className="text-[10px] opacity-60">Gemini 3 Flash Powered</p>
+                 <p className="text-[10px] opacity-60">Claude · Anthropic</p>
               </div>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-white hover:text-[#d4af37]">&times;</button>
