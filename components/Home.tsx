@@ -53,7 +53,8 @@ const Home: React.FC<HomeProps> = ({ members, user }) => {
 
   const divinoProfile = members.find(m => m.full_name.includes("Divino Ribeiro Viana"));
   const divinoLattes = divinoProfile?.lattes_url || "http://lattes.cnpq.br/7639474934278364";
-  const membersWithCV = members.filter(m => m.lattes_url);
+  const researchers = members.filter(m => m.lattes_url?.trim() || m.academic_info?.trim() || m.bio?.trim());
+  const scrolls = researchers.length > 3;
 
   return (
     <div className="space-y-16 pb-20">
@@ -100,28 +101,57 @@ const Home: React.FC<HomeProps> = ({ members, user }) => {
               <span className="w-2 h-8 bg-[#d4af37] rounded"></span>
               Pesquisadores do Grupo
             </h3>
-            <div className="grid gap-4">
-              {membersWithCV.length > 0 ? membersWithCV.map((member) => (
-                <a 
-                  key={member.id} 
-                  href={member.lattes_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="bg-white p-4 rounded-lg border border-slate-200 flex items-center justify-between hover:border-[#d4af37] hover:shadow-md transition group"
+            {researchers.length > 0 ? (
+              <div
+                className={`relative overflow-hidden ${scrolls ? 'h-[22rem] researchers-mask' : ''}`}
+              >
+                <div
+                  className={`grid gap-3 ${scrolls ? 'researchers-scroll' : ''}`}
+                  style={scrolls ? { animationDuration: `${researchers.length * 5}s` } : undefined}
                 >
-                  <div className="flex items-center gap-3">
-                    <Avatar name={member.full_name} url={member.avatar_url} className="w-8 h-8 text-xs" />
-                    <div>
-                      <p className="text-sm font-bold text-slate-800 group-hover:text-[#0f172a]">{member.full_name}</p>
-                      <p className="text-[10px] text-slate-400 uppercase tracking-widest">{member.academic_info || 'Membro do Grupo'}</p>
-                    </div>
-                  </div>
-                  <span className="text-xs text-[#d4af37] font-bold group-hover:underline">Ver Lattes &rarr;</span>
-                </a>
-              )) : (
-                <p className="text-sm text-slate-400 italic text-center py-4">Nenhum currículo de membro cadastrado ainda.</p>
-              )}
-            </div>
+                  {(scrolls ? [...researchers, ...researchers] : researchers).map((member, i) => {
+                    const card = (
+                      <>
+                        <Avatar name={member.full_name} url={member.avatar_url} className="w-11 h-11 text-sm" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-slate-800 group-hover:text-[#0f172a] truncate">{member.full_name}</p>
+                          <p className="text-[11px] text-[#9a7e1f] font-semibold uppercase tracking-wider truncate">
+                            {member.academic_info || 'Membro do Grupo'}
+                          </p>
+                          {member.bio && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{member.bio}</p>}
+                        </div>
+                        {member.lattes_url && (
+                          <span className="text-xs text-[#d4af37] font-bold group-hover:underline shrink-0 self-center">Lattes &rarr;</span>
+                        )}
+                      </>
+                    );
+                    const cls = 'bg-white p-4 rounded-lg border border-slate-200 flex items-start gap-3 transition group';
+                    const hidden = i >= researchers.length;
+                    return member.lattes_url ? (
+                      <a
+                        key={`${member.id}-${i}`}
+                        href={member.lattes_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-hidden={hidden || undefined}
+                        tabIndex={hidden ? -1 : undefined}
+                        className={`${cls} hover:border-[#d4af37] hover:shadow-md`}
+                      >
+                        {card}
+                      </a>
+                    ) : (
+                      <div key={`${member.id}-${i}`} aria-hidden={hidden || undefined} className={cls}>
+                        {card}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400 italic text-center py-4">
+                Nenhum pesquisador com formação cadastrada ainda. Complete seu perfil para aparecer aqui!
+              </p>
+            )}
           </div>
         </div>
 
