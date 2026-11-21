@@ -269,6 +269,55 @@ CREATE POLICY "Admins removem posts da Ágora" ON public.agora_posts
 -- Atualizações em tempo real
 ALTER PUBLICATION supabase_realtime ADD TABLE public.agora_posts;
 
+-- ------------------------------------------------------------
+-- 9b. Comentários da Ágora (qualquer pessoa pode comentar)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.agora_comments (
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  post_id     UUID NOT NULL REFERENCES public.agora_posts(id) ON DELETE CASCADE,
+  content     TEXT NOT NULL,
+  author_name TEXT NOT NULL,
+  author_id   UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  is_member   BOOLEAN NOT NULL DEFAULT false,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS agora_comments_post_id_idx ON public.agora_comments(post_id);
+
+ALTER TABLE public.agora_comments ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Comentários visíveis para todos" ON public.agora_comments;
+CREATE POLICY "Comentários visíveis para todos" ON public.agora_comments
+  FOR SELECT USING (true);
+
+-- Visitantes comentam como convidados; membros só podem comentar em seu próprio nome
+DROP POLICY IF EXISTS "Qualquer um comenta na Ágora" ON public.agora_comments;
+CREATE POLICY "Qualquer um comenta na Ágora" ON public.agora_comments
+  FOR INSERT WITH CHECK (
+    char_length(content) BETWEEN 1 AND 2000
+    AND char_length(author_name) BETWEEN 1 AND 80
+    AND (
+      (author_id IS NULL AND is_member = false)
+      OR (author_id = auth.uid() AND is_member = true)
+    )
+  );
+
+DROP POLICY IF EXISTS "Admins removem comentários" ON public.agora_comments;
+CREATE POLICY "Admins removem comentários" ON public.agora_comments
+  FOR DELETE USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'agora_comments'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.agora_comments;
+  END IF;
+END $$;
+
 -- ============================================================
 -- 10. STORAGE: bucket de fotos da galeria
 -- ============================================================
