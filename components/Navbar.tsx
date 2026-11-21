@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { UserProfile } from '../types';
+import Avatar from './Avatar';
 
 interface NavbarProps {
   user: UserProfile | null;
@@ -46,9 +47,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
             <div className="flex items-center space-x-4">
               <Link to="/perfil" className="text-sm hover:text-[#d4af37] flex items-center gap-2">
                 <span className="hidden sm:inline">Olá, {user.username}</span>
-                <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs border border-[#d4af37]">
-                  {user.username[0].toUpperCase()}
-                </div>
+                <Avatar name={user.username} url={user.avatar_url} className="w-8 h-8 text-xs border border-[#d4af37]" />
               </Link>
               {user.role === 'admin' && (
                 <Link to="/admin" className="text-xs bg-[#d4af37] text-[#0f172a] px-3 py-1 rounded font-bold uppercase">Admin</Link>

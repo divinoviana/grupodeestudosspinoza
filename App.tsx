@@ -87,12 +87,12 @@ const App: React.FC = () => {
     setCurrentUser(null);
   };
 
-  const handleUpdateProfile = async (profile: UserProfile) => {
+  const handleUpdateProfile = async (profile: UserProfile): Promise<string | null> => {
     const { error } = await supabase.from('profiles').upsert(profile);
-    if (!error) {
-      setCurrentUser(profile);
-      fetchInitialData();
-    }
+    if (error) return error.message;
+    setCurrentUser(profile);
+    fetchInitialData();
+    return null;
   };
 
   const addTopic = async (topic: ForumTopic) => {

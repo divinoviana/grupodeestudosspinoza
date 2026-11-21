@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { UserProfile } from '../types';
 import Agora from './Agora';
+import Avatar from './Avatar';
 
 const CHANNEL_ID = 'UCTJEBpIkx-ghf5N9TuAsG8g';
 
@@ -109,9 +110,7 @@ const Home: React.FC<HomeProps> = ({ members, user }) => {
                   className="bg-white p-4 rounded-lg border border-slate-200 flex items-center justify-between hover:border-[#d4af37] hover:shadow-md transition group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#0f172a] text-[#d4af37] flex items-center justify-center text-xs font-bold">
-                      {member.full_name[0].toUpperCase()}
-                    </div>
+                    <Avatar name={member.full_name} url={member.avatar_url} className="w-8 h-8 text-xs" />
                     <div>
                       <p className="text-sm font-bold text-slate-800 group-hover:text-[#0f172a]">{member.full_name}</p>
                       <p className="text-[10px] text-slate-400 uppercase tracking-widest">{member.academic_info || 'Membro do Grupo'}</p>
@@ -133,7 +132,8 @@ const Home: React.FC<HomeProps> = ({ members, user }) => {
           </h3>
           <div className="flex flex-wrap gap-3">
             {members.map((member, i) => (
-              <span key={i} className="px-4 py-2 bg-slate-50 text-slate-700 rounded-full border border-slate-200 text-sm font-medium hover:bg-[#d4af37]/10 transition cursor-default">
+              <span key={i} className="pl-1.5 pr-4 py-1.5 bg-slate-50 text-slate-700 rounded-full border border-slate-200 text-sm font-medium hover:bg-[#d4af37]/10 transition cursor-default flex items-center gap-2">
+                <Avatar name={member.full_name} url={member.avatar_url} className="w-7 h-7 text-[11px]" />
                 {member.full_name}
               </span>
             ))}

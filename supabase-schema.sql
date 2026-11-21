@@ -340,6 +340,30 @@ CREATE POLICY "Admins apagam fotos" ON storage.objects
     AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
+-- Fotos de perfil: cada usuário só mexe na própria pasta (avatars/<id do usuário>/...)
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('avatars', 'avatars', true, 3145728, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+ON CONFLICT (id) DO UPDATE SET
+  public = true,
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DROP POLICY IF EXISTS "Fotos de perfil públicas" ON storage.objects;
+CREATE POLICY "Fotos de perfil públicas" ON storage.objects
+  FOR SELECT USING (bucket_id = 'avatars');
+
+DROP POLICY IF EXISTS "Usuário envia a própria foto" ON storage.objects;
+CREATE POLICY "Usuário envia a própria foto" ON storage.objects
+  FOR INSERT TO authenticated WITH CHECK (
+    bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+DROP POLICY IF EXISTS "Usuário apaga a própria foto" ON storage.objects;
+CREATE POLICY "Usuário apaga a própria foto" ON storage.objects
+  FOR DELETE TO authenticated USING (
+    bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
 -- ============================================================
 -- 11. DADOS INICIAIS: Publicações do Prof. Divino Ribeiro Viana
 -- ============================================================
