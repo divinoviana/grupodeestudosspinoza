@@ -12,7 +12,7 @@ jobs:
       - name: Consulta simples ao banco
         run: |
           status=$(curl -sS -o /dev/null -w "%{http_code}" \
-            "https://gazpzkcnyfmfnzhwarob.supabase.co/rest/v1/publications?select=id&limit=1" \
-            -H "apikey: sb_publishable_XQssUC8DYOjDUnM0BE1aFA__MU3SlZa")
+            "https://qqqkcfwxrncniiuihiyd.supabase.co/rest/v1/publications?select=id&limit=1" \
+            -H "apikey: sb_publishable_EFhGXOVCX7tKDJpewjm9bQ_Z6dNW3P1")
           echo "Resposta do Supabase: $status"
           test "$status" = "200"
