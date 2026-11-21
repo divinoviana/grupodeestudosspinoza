@@ -10,6 +10,7 @@ export interface UserProfile {
   role: UserRole;
   avatar_url?: string;
   lattes_url?: string;
+  email_notifications?: boolean;
 }
 
 export interface Publication {

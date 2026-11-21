@@ -285,6 +285,19 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdate }) => {
               />
             </div>
 
+            <label className="flex items-start gap-3 p-4 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-0.5 w-4 h-4 accent-[#d4af37]"
+                checked={formData.email_notifications !== false}
+                onChange={e => setFormData({ ...formData, email_notifications: e.target.checked })}
+              />
+              <span>
+                <span className="block text-sm font-bold text-slate-700">Receber novidades por e-mail</span>
+                <span className="block text-xs text-slate-400 mt-0.5">Novas publicações, tópicos no fórum e eventos. Os avisos no sininho do menu continuam aparecendo.</span>
+              </span>
+            </label>
+
             {dataMsg && <Notice {...dataMsg} />}
 
             <div className="pt-6 border-t flex justify-end">

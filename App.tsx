@@ -88,7 +88,8 @@ const App: React.FC = () => {
   };
 
   const handleUpdateProfile = async (profile: UserProfile): Promise<string | null> => {
-    const { error } = await supabase.from('profiles').upsert(profile);
+    const { notifications_seen_at: _seen, ...fields } = profile as UserProfile & { notifications_seen_at?: string };
+    const { error } = await supabase.from('profiles').upsert(fields);
     if (error) return error.message;
     setCurrentUser(profile);
     fetchInitialData();

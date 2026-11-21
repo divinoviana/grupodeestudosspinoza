@@ -191,6 +191,109 @@ CREATE POLICY "Usuário apaga a própria foto" ON storage.objects
   );
 
 -- ------------------------------------------------------------
+-- Avisos de novidades (sininho + e-mail)
+-- ------------------------------------------------------------
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email_notifications BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS notifications_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  kind       TEXT NOT NULL CHECK (kind IN ('publicacao', 'forum', 'evento', 'agora')),
+  title      TEXT NOT NULL,
+  body       TEXT NOT NULL DEFAULT '',
+  link       TEXT NOT NULL DEFAULT '/',
+  actor_id   TEXT,
+  send_email BOOLEAN NOT NULL DEFAULT false,
+  emailed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS notifications_created_at_idx ON public.notifications(created_at DESC);
+
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- Só membros cadastrados veem os avisos; ninguém insere pelo site (apenas os gatilhos abaixo)
+DROP POLICY IF EXISTS "Membros veem avisos" ON public.notifications;
+CREATE POLICY "Membros veem avisos" ON public.notifications
+  FOR SELECT TO authenticated USING (true);
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'notifications'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+  END IF;
+END $$;
+
+-- Permite que o banco chame o site para disparar os e-mails
+CREATE EXTENSION IF NOT EXISTS pg_net;
+
+CREATE OR REPLACE FUNCTION public.create_notification()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+  n public.notifications;
+BEGIN
+  IF TG_TABLE_NAME = 'publications' THEN
+    INSERT INTO public.notifications (kind, title, body, link, actor_id, send_email)
+    VALUES ('publicacao', 'Nova publicação: ' || NEW.title,
+            NEW.author_name || ' — ' || left(NEW.abstract, 220), '/publicacoes', NEW.author_id, true)
+    RETURNING * INTO n;
+  ELSIF TG_TABLE_NAME = 'forum_topics' THEN
+    INSERT INTO public.notifications (kind, title, body, link, actor_id, send_email)
+    VALUES ('forum', 'Novo tópico no fórum (' || NEW.category || '): ' || NEW.title,
+            NEW.author_name || ' — ' || left(NEW.content, 220), '/forum', NEW.author_id::text, true)
+    RETURNING * INTO n;
+  ELSIF TG_TABLE_NAME = 'events' THEN
+    INSERT INTO public.notifications (kind, title, body, link, actor_id, send_email)
+    VALUES ('evento', 'Novo evento: ' || NEW.title,
+            to_char(NEW.date, 'DD/MM/YYYY') || ' às ' || NEW.time || ' — ' || left(NEW.description, 200),
+            '/eventos', NULL, true)
+    RETURNING * INTO n;
+  ELSIF TG_TABLE_NAME = 'agora_posts' THEN
+    INSERT INTO public.notifications (kind, title, body, link, actor_id, send_email)
+    VALUES ('agora', NEW.author_name || ' compartilhou um pensamento na Ágora',
+            left(NEW.content, 220), '/', NEW.author_id::text, false)
+    RETURNING * INTO n;
+  END IF;
+
+  IF n.send_email THEN
+    BEGIN
+      PERFORM net.http_post(
+        url := 'https://www.herem.com.br/api/notify',
+        body := jsonb_build_object('id', n.id),
+        headers := '{"Content-Type": "application/json"}'::jsonb
+      );
+    EXCEPTION WHEN OTHERS THEN
+      NULL; -- uma falha no envio de e-mail nunca impede a publicação
+    END;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS notify_publications ON public.publications;
+CREATE TRIGGER notify_publications AFTER INSERT ON public.publications
+  FOR EACH ROW EXECUTE FUNCTION public.create_notification();
+
+DROP TRIGGER IF EXISTS notify_forum_topics ON public.forum_topics;
+CREATE TRIGGER notify_forum_topics AFTER INSERT ON public.forum_topics
+  FOR EACH ROW EXECUTE FUNCTION public.create_notification();
+
+DROP TRIGGER IF EXISTS notify_events ON public.events;
+CREATE TRIGGER notify_events AFTER INSERT ON public.events
+  FOR EACH ROW EXECUTE FUNCTION public.create_notification();
+
+DROP TRIGGER IF EXISTS notify_agora_posts ON public.agora_posts;
+CREATE TRIGGER notify_agora_posts AFTER INSERT ON public.agora_posts
+  FOR EACH ROW EXECUTE FUNCTION public.create_notification();
+
+-- ------------------------------------------------------------
 -- 5. Conferência: lista as tabelas e quantos registros cada uma tem
 -- ------------------------------------------------------------
 SELECT 'profiles' AS tabela, COUNT(*) AS registros FROM public.profiles
@@ -200,4 +303,5 @@ UNION ALL SELECT 'forum_topics', COUNT(*) FROM public.forum_topics
 UNION ALL SELECT 'gallery_items', COUNT(*) FROM public.gallery_items
 UNION ALL SELECT 'contact_messages', COUNT(*) FROM public.contact_messages
 UNION ALL SELECT 'agora_posts', COUNT(*) FROM public.agora_posts
-UNION ALL SELECT 'agora_comments', COUNT(*) FROM public.agora_comments;
+UNION ALL SELECT 'agora_comments', COUNT(*) FROM public.agora_comments
+UNION ALL SELECT 'notifications', COUNT(*) FROM public.notifications;

@@ -3,6 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { UserProfile } from '../types';
 import Avatar from './Avatar';
+import NotificationBell from './NotificationBell';
 
 interface NavbarProps {
   user: UserProfile | null;
@@ -45,6 +46,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
         <div className="flex items-center space-x-4">
           {user ? (
             <div className="flex items-center space-x-4">
+              <NotificationBell user={user} />
               <Link to="/perfil" className="text-sm hover:text-[#d4af37] flex items-center gap-2">
                 <span className="hidden sm:inline">Olá, {user.username}</span>
                 <Avatar name={user.username} url={user.avatar_url} className="w-8 h-8 text-xs border border-[#d4af37]" />
